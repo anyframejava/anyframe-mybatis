@@ -10,7 +10,7 @@
 	<groupId>anyframe</groupId>
 	<artifactId>anyframe-mybatis-sample</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 
 	<dependencies>
 		<!-- mybatis sample dependencies START -->
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
+            <version>1.2.16</version>
         </dependency>
         <dependency>
 			<groupId>org.springframework</groupId>
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>1.6</version>
+            <version>1.6.2</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
