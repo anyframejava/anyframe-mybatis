@@ -1,0 +1,95 @@
+#macro( parameter $parameterName)## start of inputParameter
+#if($util.isEmpty($parameterName)) #else parameterType="$parameterName" #end
+#end
+####
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : mapper_${dao.name}_sql.xml 
+    Description : #foreach($eachline in ${dao.descriptionLines})
+                                     ${eachline}
+                  #end
+-->
+<mapper namespace="${dao.name}">
+#foreach($method in $dao.methodInfoList)
+#set($sqlMapId = ${method.sqlId})
+#set($sqlAttribute = ${method.sqlAttribute})
+#set($type = ${method.type})
+#if($type == "selectOne" || $type == "list" || $type == "listPage" || $type == "listPageCount" || $type == "paging")
+	<resultMap id="${sqlMapId}-result" type="$util.generic(${method.qualifiedReturnType})">
+#foreach($rowMapper in $method.rowMappers)
+		<result property="${rowMapper.fieldName}" column="${rowMapper.columnName}"/>
+#end
+	</resultMap>
+	
+    <!--
+        SQL Name : ${sqlMapId} ($!{method.localName}) 
+        Description : #foreach($eachline in ${method.descriptionLines})
+                                          ${eachline}
+                      #end
+		parameterType : ${method.parameter.qualifiedName}
+		resultMap : ${sqlMapId}-result
+    -->
+	<${method.typeGroup} id="${sqlMapId}" #parameter(${method.parameter.qualifiedName}) resultMap="${sqlMapId}-result" useCache="${sqlAttribute.useCache}" flushCache="${sqlAttribute.flushCache}">
+#foreach($eachLine in ${method.sqlLines})
+		${eachLine}
+#end
+	</${method.typeGroup}>
+#end
+#if($type == "insert" || $type == "update" || $type == "delete" || $type == "insertBatch" || $type == "updateBatch" || $type == "deleteBatch" || $type == "executeBatch")
+    <!--
+        SQL Name : ${sqlMapId} ($!{method.localName}) 
+        Description : #foreach($eachline in ${method.descriptionLines})
+                                          ${eachline}
+                      #end
+		parameterType : ${method.parameter.qualifiedName}
+    -->	
+	<${method.typeGroup} id="${sqlMapId}" #parameter(${method.parameter.qualifiedName}) >
+#foreach($eachLine in ${method.sqlLines})
+		${eachLine}
+#end
+	</${method.typeGroup}>
+#end
+#if($type == "dynamicSelect" || $type == "dynamicList")
+	<resultMap id="${sqlMapId}-result}" type="$util.generic(${method.qualifiedReturnType})">
+#foreach($rowMapper in $method.rowMappers)
+		<result property="${rowMapper.fieldName}" column="${rowMapper.columnName}"/>
+#end
+	</resultMap>
+	
+    <!--
+        SQL Name : ${sqlMapId} ($!{method.localName}) 
+        Description : #foreach($eachline in ${method.descriptionLines})
+                                          ${eachline}
+                      #end
+		parameterType : java.util.HashMap
+		resultMap : ${sqlMapId}-result
+    -->	
+	<${method.typeGroup} id="${sqlMapId}" parameterType="java.util.HashMap" resultMap="${sqlMapId}-result" >
+#foreach($eachLine in ${method.sqlLines})
+		${eachLine}
+#end
+	</${method.typeGroup}>
+#end
+#if($type == "execute")
+	<resultMap id="${sqlMapId}-result" type="$util.generic(${method.qualifiedReturnType})">
+#foreach($setter in $method.setters)
+		<result property="${setter.fieldName}" column="${setter.columnName}" />
+#end
+	</resultMap>
+   <!--
+        SQL Name : ${sqlMapId} ($!{method.localName}) 
+        Description : #foreach($eachline in ${method.descriptionLines})
+                                          ${eachline}
+                      #end
+		parameterType : java.util.HashMap
+		resultMap : ${sqlMapId}-result
+    -->	
+	<select id="${sqlMapId}"  statementType="CALLABLE" #parameter(${method.parameter.qualifiedName}) resultMap="${sqlMapId}-result" >
+#foreach($eachLine in ${method.sqlLines})
+		${eachLine}
+#end
+	</select>	
+#end
+#end
+</mapper>

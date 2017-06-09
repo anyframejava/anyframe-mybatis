@@ -1,0 +1,94 @@
+####################################################################
+##### Default DAO Template for Anyframe Enterprise
+####################################################################
+#set($type = $method.type)
+#set($sqlMapId = ${method.sqlId})
+
+#macro( inputParameter $inputType)## start of inputParameter
+#if($inputType=="Map"), inputMap#elseif($inputType=="VO"), inputVO#elseif($inputType=="List"), inputList #elseif($inputType==""||$inputType=="[EMPTY]"), new Object[]{}#end
+#end## end of inputParameter
+
+### end of macro ##
+
+	/**
+	 * @description
+#foreach($eachline in ${method.descriptionLines})
+     * $eachline
+#end
+     * 
+#if(!$util.isEmpty(${method.localName}))
+     * @localName ${method.localName}
+#end
+	 * @dmlType ${method.type}
+#foreach($parameter in ${method.parametres})
+	 * @param ${parameter.name}
+#end
+	 * @return
+	 */
+#if($type == "selectOne")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().selectOne("$sqlMapId"#inputParameter(${method.inputType}));
+	}
+#end
+#if($type == "list")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().selectList("$sqlMapId"#inputParameter(${method.inputType}));
+	}
+#end
+#if($type == "insert")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().insert("$sqlMapId"#inputParameter(${method.inputType}));
+	}
+#end
+#if($type == "update")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().update("$sqlMapId"#inputParameter(${method.inputType}));
+	}
+#end
+#if($type == "delete")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().delete("$sqlMapId"#inputParameter(${method.inputType}));
+	}
+#end
+#if($type == "executeBatch")
+	public int[] ${method.name}(final List<${method.parameter.generic}> inputList) {
+		return executeBatch("$sqlMapId", inputList);
+	}
+#end
+#if($type == "listPage")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}, int pageIndex, int pageSize) {
+		return super.getSqlSession().selectList(
+				"$sqlMapId", ${method.parameter.name},
+				new RowBounds(pageSize * (pageIndex - 1), pageSize));
+	}
+#end
+#if($type == "listPageCount")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return (Integer) super.getSqlSession().selectOne(
+				"$sqlMapId", ${method.parameter.name});
+	}
+#end
+#if($type == "paging")
+	##public Page ${method.name}(${method.parameter.declaration}, String[] nextKey, int rowCount) {
+	##	return page("$sqlMapId"#inputParameter(${method.inputType}), nextKey, rowCount);
+	##}
+	public Page ${method.name}(${method.parameter.declaration}, int pageIndex, int rowCount) {
+		##${method.parameter.declaration} searchArgs = new ${method.parameter.declaration}();
+		##searchArgs.set
+		
+		List<${method.parameter.generic}> list = super.getSqlSession().selectList(
+				"$sqlMapId", ${method.parameter.name},
+				new RowBounds(pageSize * (pageIndex - 1), pageSize));
+		
+		##int rowCount = (Integer) super.getSqlSession().selectOne(
+		##		"", searchArgs);
+		
+		return new Page(list, pageIndex, rowCount, pageUnit, pageSize);
+	}
+#end
+#if($type == "execute")
+	public ${method.returnType} ${method.name}(${method.parameter.declaration}) {
+		return super.getSqlSession().selectOne(
+				"$sqlMapId", ${method.parameter.name});
+	}
+#end
